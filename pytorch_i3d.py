@@ -332,7 +332,20 @@ class InceptionI3d(nn.Module):
         
 
     def extract_features(self, x):
+
         for end_point in self.VALID_ENDPOINTS:
             if end_point in self.end_points:
                 x = self._modules[end_point](x)
+                
         return self.avg_pool(x)
+    
+    def extract_activations(self, x):
+        activations = {}
+        for end_point in self.VALID_ENDPOINTS:
+            if end_point in self.end_points:
+                x = self._modules[end_point](x)
+                print(end_point)
+                b,c,t,w,h = x.shape
+                activations[end_point] = x.view((c,t,w,h)).permute((1,0,2,3)).detach().numpy()
+
+        return activations
